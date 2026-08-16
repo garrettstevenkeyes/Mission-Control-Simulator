@@ -84,6 +84,8 @@ main { width: min(1500px, calc(100% - 48px)); margin: 0 auto; padding: 56px 0 80
 .lesson-explanation { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .lesson-explanation > div { padding:14px; border:1px solid var(--line); background:#0a1512; }.lesson-explanation p { color:#9fafA7; font-size:9px; line-height:1.55; margin:9px 0 0; }
 .lab-takeaway { margin-top:10px; padding:14px; border:1px solid #625224; background:#211e12; }.lab-takeaway span { color:var(--amber); font:500 8px var(--mono); letter-spacing:.1em; }.lab-takeaway p { color:#d2c8aa; font-size:11px; line-height:1.55; margin:6px 0 0; font-weight:600; }
+.lab-deep-button { margin-top:10px; min-height:32px; display:flex; align-items:center; gap:6px; padding:0 10px; border:1px solid var(--line-bright); background:#0a1512; color:#aebcb5; font-size:9px; font-weight:700; }.lab-deep-button[aria-pressed="true"] { color:var(--lime); border-color:#52723c; }.lab-deep-button svg { width:13px; }
+.lab-deeper { margin-top:8px; padding:13px 14px; border-left:2px solid var(--blue); background:#0b1920; }.lab-deeper span { color:var(--blue); font:500 8px var(--mono); letter-spacing:.1em; }.lab-deeper p { color:#aabcc6; font-size:10px; line-height:1.55; margin:6px 0 0; }
 .next-lab-button { margin:14px 0 0 auto; display:flex; align-items:center; gap:5px; height:31px; border:0; background:none; color:var(--lime); font-size:9px; font-weight:700; text-transform:uppercase; }.next-lab-button svg { width:13px; }.next-lab-button:disabled { opacity:.3; cursor:not-allowed; }
 .lesson-reveal { animation:lesson-in .22s ease-out; }
 .lesson-locked { min-height:94px; display:flex; align-items:center; gap:13px; padding:16px; border:1px dashed #35473f; background:#09130f; color:var(--faint); }

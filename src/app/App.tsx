@@ -1,13 +1,5 @@
 import { useState } from "react";
-import { BookOpen, CircleHelp, RadioTower, Sparkles } from "lucide-react";
-import { OperatorStation } from "../features/teleoperation/components/OperatorStation";
-import { NetworkPanel } from "../features/teleoperation/components/NetworkPanel";
-import { TelemetryBar } from "../features/teleoperation/components/TelemetryBar";
-import { FeedbackLoop } from "../features/teleoperation/components/FeedbackLoop";
-import { CommandTimeline } from "../features/teleoperation/components/CommandTimeline";
-import { SafetyPanel } from "../features/teleoperation/components/SafetyPanel";
-import { ExplanationPanel } from "../features/teleoperation/components/ExplanationPanel";
-import { EventLog } from "../features/teleoperation/components/EventLog";
+import { BookOpen, CircleHelp, RadioTower } from "lucide-react";
 import { LearningLab } from "../features/teleoperation/components/LearningLab";
 import { WhyDrawer } from "../features/teleoperation/components/WhyDrawer";
 import { GuidedLearning } from "../features/teleoperation/components/GuidedLearning";
@@ -16,8 +8,7 @@ import { useTeleoperationSimulation } from "../features/teleoperation/hooks/useT
 import { guidedLabs, type GuidedLabDefinition } from "../features/teleoperation/learning/guidedLabs";
 
 export function App() {
-  const { snapshot, command, setNetwork, setMode, setTarget, setRejectStale, emergencyStop, safetyConfig } = useTeleoperationSimulation();
-  const [deep, setDeep] = useState(false);
+  const { snapshot, command, setNetwork, setMode, setTarget, setRejectStale, safetyConfig } = useTeleoperationSimulation();
   const [whyOpen, setWhyOpen] = useState(false);
   const [activeLabIndex, setActiveLabIndex] = useState(0);
   const rejectStale = safetyConfig.rejectStaleCommands;
@@ -34,7 +25,6 @@ export function App() {
       <header className="site-header">
         <a href="#top" className="brand" aria-label="Signal Yard home"><span><RadioTower /></span><div><strong>SIGNAL YARD</strong><small>Teleoperation Network Simulator</small></div></a>
         <div className="header-actions">
-          <label className="deep-toggle"><input type="checkbox" checked={deep} onChange={(event) => setDeep(event.target.checked)} /><span><Sparkles size={14} /> Go deeper</span></label>
           <button className="why-button" onClick={() => setWhyOpen(true)}><CircleHelp size={17} /> Why?</button>
         </div>
       </header>
@@ -47,24 +37,6 @@ export function App() {
 
         <GuidedLearning snapshot={snapshot} activeLabIndex={activeLabIndex} onChangeLab={setActiveLabIndex} onLoadSetup={loadLabSetup} />
         <FocusedLabWorkspace lab={activeLab} snapshot={snapshot} safetyConfig={safetyConfig} rejectStale={rejectStale} onCommand={command} onNetworkChange={setNetwork} onMode={setMode} onRejectStale={setRejectStale} onTarget={setTarget} />
-
-        <details className="system-details">
-          <summary><span><strong>System details</strong><small>Optional full controls, metrics, thresholds, and event history</small></span><span className="details-action">Open dashboards</span></summary>
-          <div className="system-detail-overview">
-            <TelemetryBar snapshot={snapshot} />
-            <section className="system-control-grid">
-              <OperatorStation activeCommand={snapshot.requestedCommand} mode={snapshot.mode} safetyState={snapshot.safety.state} onCommand={command} onMode={setMode} onEmergencyStop={emergencyStop} />
-              <NetworkPanel network={snapshot.network} rejectStale={rejectStale} onChange={setNetwork} onRejectStale={setRejectStale} onMode={setMode} />
-            </section>
-            <ExplanationPanel snapshot={snapshot} deep={deep} />
-          </div>
-          <section className="detail-grid">
-            <FeedbackLoop timing={snapshot.loopTiming} />
-            <SafetyPanel safety={snapshot.safety} config={safetyConfig} />
-            <CommandTimeline commands={snapshot.commands} />
-            <EventLog events={snapshot.events} />
-          </section>
-        </details>
 
         <details className="review-details">
           <summary><span><BookOpen /><strong>Check what you learned</strong></span><span className="details-action">Open review</span></summary>

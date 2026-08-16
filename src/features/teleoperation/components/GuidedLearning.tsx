@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Check, Circle, Eye, FlaskConical, Lightbulb, Play, Target, Wrench } from "lucide-react";
+import { ArrowRight, Check, Circle, Eye, FlaskConical, Lightbulb, Play, Sparkles, Target, Wrench } from "lucide-react";
 import {
   getLiveLabObservation,
   guidedLabs,
@@ -20,6 +20,7 @@ export function GuidedLearning({
   onLoadSetup: (lab: GuidedLabDefinition) => void;
 }) {
   const [completedLabs, setCompletedLabs] = useState<Set<string>>(() => new Set());
+  const [deep, setDeep] = useState(false);
   const lab = guidedLabs[activeLabIndex];
   const currentComplete = isGuidedLabComplete(lab.id, snapshot);
   const explanationRevealed = currentComplete || completedLabs.has(lab.id);
@@ -28,6 +29,8 @@ export function GuidedLearning({
     if (!currentComplete) return;
     setCompletedLabs((completed) => completed.has(lab.id) ? completed : new Set([...completed, lab.id]));
   }, [currentComplete, lab.id]);
+
+  useEffect(() => setDeep(false), [lab.id]);
 
   const completedCount = completedLabs.size;
 
@@ -73,6 +76,8 @@ export function GuidedLearning({
                 <div><span className="lesson-label"><Wrench /> WHAT AN ENGINEER CAN DO</span><p>{lab.engineeringResponse}</p></div>
               </div>
               <div className="lab-takeaway"><span>TAKEAWAY</span><p>{lab.takeaway}</p></div>
+              <button className="lab-deep-button" aria-pressed={deep} onClick={() => setDeep((enabled) => !enabled)}><Sparkles /> {deep ? "Hide deeper explanation" : "Go deeper"}</button>
+              {deep && <div className="lab-deeper"><span>DEEPER EXPLANATION</span><p>{lab.deepExplanation}</p></div>}
               <button className="next-lab-button" disabled={activeLabIndex === guidedLabs.length - 1} onClick={() => onChangeLab(Math.min(guidedLabs.length - 1, activeLabIndex + 1))}>
                 Next lab <ArrowRight />
               </button>

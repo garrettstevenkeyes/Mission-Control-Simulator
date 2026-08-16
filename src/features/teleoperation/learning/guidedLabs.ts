@@ -20,6 +20,7 @@ export interface GuidedLabDefinition {
   whatHappened: string;
   engineeringResponse: string;
   takeaway: string;
+  deepExplanation: string;
 }
 
 const healthyNetwork: NetworkCondition = {
@@ -43,6 +44,7 @@ export const guidedLabs: GuidedLabDefinition[] = [
     whatHappened: "The command and feedback both crossed the network quickly. The operator saw the result soon enough to make the next decision from a current view.",
     engineeringResponse: "Measure this healthy case first. A baseline makes later delay, loss, and safety behavior easier to reason about.",
     takeaway: "Teleoperation is a loop: command, machine reaction, feedback, then the operator's next command.",
+    deepExplanation: "This is a closed feedback loop. The operator uses returned state to decide the next input, so outbound and return delay both affect control.",
   },
   {
     id: "latency",
@@ -56,6 +58,7 @@ export const guidedLabs: GuidedLabDefinition[] = [
     whatHappened: "The machine received the command after the outbound delay. The visual result then needed another network trip before the operator could see it.",
     engineeringResponse: "Reduce unnecessary network trips, show state age, limit speed, and move fast control decisions closer to the machine.",
     takeaway: "A short command trip is not enough. The operator acts on the complete feedback loop.",
+    deepExplanation: "Propagation delay is travel time across the network. Queueing delay is time spent waiting behind other traffic. Both can make the returned view older.",
   },
   {
     id: "jitter",
@@ -69,6 +72,7 @@ export const guidedLabs: GuidedLabDefinition[] = [
     whatHappened: "Each packet received a different delay. A later command can arrive before an earlier one, even when the average looks acceptable.",
     engineeringResponse: "Track sequence numbers, reject older order, smooth operator input, and design around freshness instead of averages alone.",
     takeaway: "Low average latency does not guarantee predictable control when packet timing changes wildly.",
+    deepExplanation: "Jitter is variation in delivery time. It can also change packet ordering, so a newer command may arrive before an older one.",
   },
   {
     id: "loss",
@@ -82,6 +86,7 @@ export const guidedLabs: GuidedLabDefinition[] = [
     whatHappened: "Some packets disappeared before reaching their destination. Later updates may still arrive and describe a newer machine state.",
     engineeringResponse: "Decide which messages must be reliable and which are more useful when fresh. Do not treat every message the same way.",
     takeaway: "In real-time systems, the next fresh update can be more useful than waiting for every old update.",
+    deepExplanation: "Reliability means making sure data arrives. Freshness means the data still describes the current state. Real-time telemetry often values freshness more than old guaranteed updates.",
   },
   {
     id: "stale",
@@ -95,6 +100,7 @@ export const guidedLabs: GuidedLabDefinition[] = [
     whatHappened: "The packet may be valid data, but it represents old operator intent. Acting on it could undo a newer correction or stop.",
     engineeringResponse: "Attach creation times and sequence numbers, then enforce a maximum command age on the edge computer.",
     takeaway: "A command can arrive successfully and still be unsafe to use because it is stale.",
+    deepExplanation: "A timestamp measures age. A sequence number records order. Together they let the receiver reject stale state and older intent.",
   },
   {
     id: "disconnect",
@@ -108,6 +114,7 @@ export const guidedLabs: GuidedLabDefinition[] = [
     whatHappened: "Commands, heartbeats, and feedback stopped. When the heartbeat timeout passed, the edge computer stopped the machine locally.",
     engineeringResponse: "Keep heartbeat monitoring and immediate fallback behavior on the machine, where they still work without the network.",
     takeaway: "The machine cannot depend on the cloud for every safety decision.",
+    deepExplanation: "A heartbeat is a small liveness signal. When it stops, the edge computer cannot know why the link failed, but it can still enter a defined local fallback state.",
   },
   {
     id: "local-control",
@@ -121,6 +128,7 @@ export const guidedLabs: GuidedLabDefinition[] = [
     whatHappened: "Mission Control sent a larger goal. The edge computer handled the small movement steps without asking the network for each one.",
     engineeringResponse: "Use local assistance or supervised tasks when the network cannot support a tight remote feedback loop.",
     takeaway: "Local autonomy reduces how much fast back-and-forth communication the task requires.",
+    deepExplanation: "Moving the fast control loop to the edge changes the network from continuous steering into occasional task updates. That reduces how often delay can interrupt motion.",
   },
 ];
 
