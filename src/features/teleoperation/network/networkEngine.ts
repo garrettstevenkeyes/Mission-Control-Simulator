@@ -50,7 +50,7 @@ export class NetworkEngine {
     }
 
     this.packets = this.packets.filter((packet) => {
-      const keep = !this.handled.has(packet.id) || now - packet.scheduledDeliveryAt < 850;
+      const keep = !this.handled.has(packet.id) || now - packet.scheduledDeliveryAt < 1600;
       if (!keep) this.handled.delete(packet.id);
       return keep;
     });

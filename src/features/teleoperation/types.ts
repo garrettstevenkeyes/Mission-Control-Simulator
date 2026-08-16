@@ -87,9 +87,13 @@ export interface MachineState {
 
 export interface LoopTiming {
   commandSequence: number;
+  commandType: CommandType;
   sentAt: number;
-  receivedAt: number;
-  reactedAt: number;
+  scheduledDeliveryAt: number;
+  result: CommandResult;
+  receivedAt?: number;
+  reactedAt?: number;
+  feedbackMeasuredAt?: number;
   feedbackAt?: number;
 }
 

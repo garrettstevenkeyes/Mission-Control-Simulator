@@ -3,7 +3,7 @@ import { BookOpen, CircleHelp, RadioTower, Sparkles } from "lucide-react";
 import { OperatorStation } from "../features/teleoperation/components/OperatorStation";
 import { ExcavatorScene } from "../features/teleoperation/components/ExcavatorScene";
 import { NetworkPanel } from "../features/teleoperation/components/NetworkPanel";
-import { PacketFlow } from "../features/teleoperation/components/PacketFlow";
+import { CommandTrace } from "../features/teleoperation/components/CommandTrace";
 import { TelemetryBar } from "../features/teleoperation/components/TelemetryBar";
 import { FeedbackLoop } from "../features/teleoperation/components/FeedbackLoop";
 import { CommandTimeline } from "../features/teleoperation/components/CommandTimeline";
@@ -44,7 +44,7 @@ export function App() {
           <NetworkPanel network={snapshot.network} rejectStale={rejectStale} onChange={setNetwork} onRejectStale={setRejectStale} onMode={setMode} />
         </section>
 
-        <PacketFlow packets={snapshot.packets} now={snapshot.now} connected={snapshot.network.connected} />
+        <CommandTrace timing={snapshot.loopTiming} packets={snapshot.packets} now={snapshot.now} connected={snapshot.network.connected} />
         <ExplanationPanel snapshot={snapshot} deep={deep} />
 
         <section className="detail-grid">

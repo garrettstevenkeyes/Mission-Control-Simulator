@@ -5,8 +5,8 @@ export function FeedbackLoop({ timing }: { timing: LoopTiming | null }) {
   const base = timing?.sentAt ?? 0;
   const steps = timing ? [
     ["Command sent", 0],
-    ["Machine received", timing.receivedAt - base],
-    ["Machine reacted", timing.reactedAt - base],
+    ["Machine received", timing.receivedAt ? timing.receivedAt - base : null],
+    ["Machine reacted", timing.reactedAt ? timing.reactedAt - base : null],
     ["Feedback arrived", timing.feedbackAt ? timing.feedbackAt - base : null],
   ] as const : [];
   return (

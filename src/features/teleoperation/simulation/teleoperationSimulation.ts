@@ -99,6 +99,13 @@ export class TeleoperationSimulation {
     this.events.add(this.now, "command", `Command #${command.sequence} ${type.replace("-", " ")} sent`);
     const packet = this.sendPacket("command", "outbound", command);
     if (packet.dropped) record.result = packet.dropReason === "disconnect" ? "disconnected" : "lost";
+    this.loopTiming = {
+      commandSequence: command.sequence,
+      commandType: command.type,
+      sentAt: command.createdAt,
+      scheduledDeliveryAt: packet.scheduledDeliveryAt,
+      result: record.result,
+    };
     return record;
   }
 
@@ -189,13 +196,17 @@ export class TeleoperationSimulation {
         record.ageMs = age;
         record.result = reason ?? "applied";
       }
+      if (this.loopTiming?.commandSequence === command.sequence) {
+        this.loopTiming.receivedAt = this.now;
+        this.loopTiming.result = reason ?? "applied";
+      }
       if (reason) {
         if (reason === "too-old") this.stats.staleCommands += 1;
         this.events.add(this.now, "safety", `Command #${command.sequence} ignored: ${reason === "too-old" ? "too old" : "newer command already applied"}`);
         return;
       }
       this.machine.applyCommand(command);
-      this.loopTiming = { commandSequence: command.sequence, sentAt: command.createdAt, receivedAt: this.now, reactedAt: this.now + 30 };
+      if (this.loopTiming?.commandSequence === command.sequence) this.loopTiming.reactedAt = this.now + 30;
       this.events.add(this.now, "command", `Command #${command.sequence} received`);
       return;
     }
@@ -209,6 +220,7 @@ export class TeleoperationSimulation {
     const record = this.commands.find((item) => item.sequence === telemetry.appliedCommandSequence);
     if (record && !record.feedbackAt) record.feedbackAt = this.now;
     if (this.loopTiming && telemetry.appliedCommandSequence === this.loopTiming.commandSequence && !this.loopTiming.feedbackAt) {
+      this.loopTiming.feedbackMeasuredAt = telemetry.measuredAt;
       this.loopTiming.feedbackAt = this.now;
     }
   }
