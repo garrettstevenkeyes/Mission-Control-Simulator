@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { BookOpen, CircleHelp, RadioTower, Sparkles } from "lucide-react";
 import { OperatorStation } from "../features/teleoperation/components/OperatorStation";
-import { ExcavatorScene } from "../features/teleoperation/components/ExcavatorScene";
 import { NetworkPanel } from "../features/teleoperation/components/NetworkPanel";
-import { CommandTrace } from "../features/teleoperation/components/CommandTrace";
 import { TelemetryBar } from "../features/teleoperation/components/TelemetryBar";
 import { FeedbackLoop } from "../features/teleoperation/components/FeedbackLoop";
 import { CommandTimeline } from "../features/teleoperation/components/CommandTimeline";
@@ -13,8 +11,9 @@ import { EventLog } from "../features/teleoperation/components/EventLog";
 import { LearningLab } from "../features/teleoperation/components/LearningLab";
 import { WhyDrawer } from "../features/teleoperation/components/WhyDrawer";
 import { GuidedLearning } from "../features/teleoperation/components/GuidedLearning";
+import { FocusedLabWorkspace } from "../features/teleoperation/components/FocusedLabWorkspace";
 import { useTeleoperationSimulation } from "../features/teleoperation/hooks/useTeleoperationSimulation";
-import type { GuidedLabDefinition } from "../features/teleoperation/learning/guidedLabs";
+import { guidedLabs, type GuidedLabDefinition } from "../features/teleoperation/learning/guidedLabs";
 
 export function App() {
   const { snapshot, command, setNetwork, setMode, setTarget, setRejectStale, emergencyStop, safetyConfig } = useTeleoperationSimulation();
@@ -22,6 +21,7 @@ export function App() {
   const [whyOpen, setWhyOpen] = useState(false);
   const [activeLabIndex, setActiveLabIndex] = useState(0);
   const rejectStale = safetyConfig.rejectStaleCommands;
+  const activeLab = guidedLabs[activeLabIndex] ?? guidedLabs[0];
 
   const loadLabSetup = (lab: GuidedLabDefinition) => {
     setNetwork(lab.setup.network);
@@ -46,20 +46,18 @@ export function App() {
         </section>
 
         <GuidedLearning snapshot={snapshot} activeLabIndex={activeLabIndex} onChangeLab={setActiveLabIndex} onLoadSetup={loadLabSetup} />
-
-        <TelemetryBar snapshot={snapshot} />
-
-        <section className="simulator-grid">
-          <OperatorStation activeCommand={snapshot.requestedCommand} mode={snapshot.mode} safetyState={snapshot.safety.state} onCommand={command} onMode={setMode} onEmergencyStop={emergencyStop} />
-          <ExcavatorScene machine={snapshot.machine} operatorView={snapshot.operatorView} mode={snapshot.mode} quality={snapshot.feedbackQuality} onTarget={setTarget} />
-          <NetworkPanel network={snapshot.network} rejectStale={rejectStale} onChange={setNetwork} onRejectStale={setRejectStale} onMode={setMode} />
-        </section>
-
-        <CommandTrace timing={snapshot.loopTiming} packets={snapshot.packets} now={snapshot.now} connected={snapshot.network.connected} />
-        <ExplanationPanel snapshot={snapshot} deep={deep} />
+        <FocusedLabWorkspace lab={activeLab} snapshot={snapshot} safetyConfig={safetyConfig} rejectStale={rejectStale} onCommand={command} onNetworkChange={setNetwork} onMode={setMode} onRejectStale={setRejectStale} onTarget={setTarget} />
 
         <details className="system-details">
-          <summary><span><strong>System details</strong><small>Command timing, safety thresholds, timeline, and event history</small></span><span className="details-action">Open dashboards</span></summary>
+          <summary><span><strong>System details</strong><small>Optional full controls, metrics, thresholds, and event history</small></span><span className="details-action">Open dashboards</span></summary>
+          <div className="system-detail-overview">
+            <TelemetryBar snapshot={snapshot} />
+            <section className="system-control-grid">
+              <OperatorStation activeCommand={snapshot.requestedCommand} mode={snapshot.mode} safetyState={snapshot.safety.state} onCommand={command} onMode={setMode} onEmergencyStop={emergencyStop} />
+              <NetworkPanel network={snapshot.network} rejectStale={rejectStale} onChange={setNetwork} onRejectStale={setRejectStale} onMode={setMode} />
+            </section>
+            <ExplanationPanel snapshot={snapshot} deep={deep} />
+          </div>
           <section className="detail-grid">
             <FeedbackLoop timing={snapshot.loopTiming} />
             <SafetyPanel safety={snapshot.safety} config={safetyConfig} />

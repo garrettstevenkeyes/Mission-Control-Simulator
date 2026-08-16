@@ -22,6 +22,7 @@ export function GuidedLearning({
   const [completedLabs, setCompletedLabs] = useState<Set<string>>(() => new Set());
   const lab = guidedLabs[activeLabIndex];
   const currentComplete = isGuidedLabComplete(lab.id, snapshot);
+  const explanationRevealed = currentComplete || completedLabs.has(lab.id);
 
   useEffect(() => {
     if (!currentComplete) return;
@@ -65,16 +66,20 @@ export function GuidedLearning({
             <span>{currentComplete ? <Check /> : <Eye />}</span><div><small>LIVE OBSERVATION</small><p>{getLiveLabObservation(lab.id, snapshot)}</p></div>
           </div>
 
-          <div className="lesson-explanation">
-            <div><span className="lesson-label"><Lightbulb /> WHAT HAPPENED</span><p>{lab.whatHappened}</p></div>
-            <div><span className="lesson-label"><Wrench /> WHAT AN ENGINEER CAN DO</span><p>{lab.engineeringResponse}</p></div>
-          </div>
-
-          <div className="lab-takeaway"><span>TAKEAWAY</span><p>{lab.takeaway}</p></div>
-
-          <button className="next-lab-button" disabled={activeLabIndex === guidedLabs.length - 1} onClick={() => onChangeLab(Math.min(guidedLabs.length - 1, activeLabIndex + 1))}>
-            Next lab <ArrowRight />
-          </button>
+          {explanationRevealed ? (
+            <div className="lesson-reveal">
+              <div className="lesson-explanation">
+                <div><span className="lesson-label"><Lightbulb /> WHAT HAPPENED</span><p>{lab.whatHappened}</p></div>
+                <div><span className="lesson-label"><Wrench /> WHAT AN ENGINEER CAN DO</span><p>{lab.engineeringResponse}</p></div>
+              </div>
+              <div className="lab-takeaway"><span>TAKEAWAY</span><p>{lab.takeaway}</p></div>
+              <button className="next-lab-button" disabled={activeLabIndex === guidedLabs.length - 1} onClick={() => onChangeLab(Math.min(guidedLabs.length - 1, activeLabIndex + 1))}>
+                Next lab <ArrowRight />
+              </button>
+            </div>
+          ) : (
+            <div className="lesson-locked"><Lightbulb /><div><strong>Explanation hidden for now</strong><p>Run the experiment first. The result and engineering takeaway will appear here.</p></div></div>
+          )}
         </div>
       </div>
     </section>
