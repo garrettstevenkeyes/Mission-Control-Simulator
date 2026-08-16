@@ -54,7 +54,12 @@ main { width: min(1500px, calc(100% - 48px)); margin: 0 auto; padding: 56px 0 80
 .metric-card:last-child { border-right: 0; }
 .metric-label { color: var(--muted); font: 500 10px/1 var(--mono); letter-spacing: .07em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
 .metric-label svg { width: 13px; height: 13px; color: var(--faint); }
-.metric-value { font: 500 clamp(17px, 1.6vw, 24px)/1.1 var(--mono); margin: 11px 0 7px; white-space: nowrap; }
+.metric-value-row { display:flex; align-items:center; gap:8px; margin:11px 0 7px; min-width:0; }
+.metric-value { font: 500 clamp(17px, 1.6vw, 24px)/1.1 var(--mono); white-space: nowrap; }
+.metric-status { padding:4px 5px; border:1px solid currentColor; font:500 7px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; }
+.metric-status-good { color:var(--green); background:rgba(105,211,154,.06); }
+.metric-status-warn { color:var(--amber); background:rgba(243,184,73,.06); }
+.metric-status-bad { color:var(--red); background:rgba(240,109,91,.06); }
 .metric-hint { color: var(--faint); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .simulator-grid { display: grid; grid-template-columns: 260px minmax(480px, 1fr) 310px; gap: 18px; align-items: stretch; }
 .panel { background: linear-gradient(145deg, rgba(17,31,27,.97), rgba(11,23,20,.97)); border: 1px solid var(--line); }

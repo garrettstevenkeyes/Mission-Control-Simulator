@@ -122,6 +122,7 @@ export interface SimulationSnapshot {
   requestedCommand: CommandType;
   machine: MachineState;
   operatorView: Telemetry;
+  telemetry: Telemetry;
   safety: SafetyStatus;
   packets: NetworkPacket[];
   commands: CommandRecord[];

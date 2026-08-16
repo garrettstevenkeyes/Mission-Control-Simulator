@@ -46,6 +46,7 @@ export class TeleoperationSimulation {
   private lastFeedbackSentAt: number;
   private lastTelemetryAt: number;
   private operatorView: Telemetry;
+  private latestTelemetry: Telemetry;
   private loopTiming: LoopTiming | null = null;
   private stats: PacketStats = { sent: 0, delivered: 0, dropped: 0, staleCommands: 0 };
   private emergencyStop = false;
@@ -60,7 +61,9 @@ export class TeleoperationSimulation {
     this.lastFeedbackSentAt = startAt - 100;
     this.lastTelemetryAt = startAt;
     this.networkEngine = networkEngine;
-    this.operatorView = this.makeTelemetry();
+    const initialTelemetry = this.makeTelemetry();
+    this.operatorView = { ...initialTelemetry };
+    this.latestTelemetry = { ...initialTelemetry };
   }
 
   tick(now: number): SimulationSnapshot {
@@ -199,6 +202,7 @@ export class TeleoperationSimulation {
     const telemetry = packet.payload as Telemetry;
     if (packet.kind === "telemetry") {
       this.lastTelemetryAt = this.now;
+      this.latestTelemetry = telemetry;
       return;
     }
     this.operatorView = telemetry;
@@ -257,6 +261,7 @@ export class TeleoperationSimulation {
       requestedCommand: this.requestedCommand,
       machine: this.machine.snapshot(),
       operatorView: { ...this.operatorView },
+      telemetry: { ...this.latestTelemetry },
       safety: this.currentSafety(),
       packets: this.networkEngine.visiblePackets(),
       commands: this.commands.map((command) => ({ ...command })),
