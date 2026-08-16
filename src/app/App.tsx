@@ -12,13 +12,22 @@ import { ExplanationPanel } from "../features/teleoperation/components/Explanati
 import { EventLog } from "../features/teleoperation/components/EventLog";
 import { LearningLab } from "../features/teleoperation/components/LearningLab";
 import { WhyDrawer } from "../features/teleoperation/components/WhyDrawer";
+import { GuidedLearning } from "../features/teleoperation/components/GuidedLearning";
 import { useTeleoperationSimulation } from "../features/teleoperation/hooks/useTeleoperationSimulation";
+import type { GuidedLabDefinition } from "../features/teleoperation/learning/guidedLabs";
 
 export function App() {
   const { snapshot, command, setNetwork, setMode, setTarget, setRejectStale, emergencyStop, safetyConfig } = useTeleoperationSimulation();
   const [deep, setDeep] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
+  const [activeLabIndex, setActiveLabIndex] = useState(0);
   const rejectStale = safetyConfig.rejectStaleCommands;
+
+  const loadLabSetup = (lab: GuidedLabDefinition) => {
+    setNetwork(lab.setup.network);
+    setMode(lab.setup.mode);
+    setRejectStale(lab.setup.rejectStaleCommands);
+  };
 
   return (
     <div className="app-shell">
@@ -36,6 +45,8 @@ export function App() {
           <p>Send a command, watch it travel, and see why remote control depends on the full feedback loop—not just a fast connection.</p>
         </section>
 
+        <GuidedLearning snapshot={snapshot} activeLabIndex={activeLabIndex} onChangeLab={setActiveLabIndex} onLoadSetup={loadLabSetup} />
+
         <TelemetryBar snapshot={snapshot} />
 
         <section className="simulator-grid">
@@ -47,17 +58,23 @@ export function App() {
         <CommandTrace timing={snapshot.loopTiming} packets={snapshot.packets} now={snapshot.now} connected={snapshot.network.connected} />
         <ExplanationPanel snapshot={snapshot} deep={deep} />
 
-        <section className="detail-grid">
-          <FeedbackLoop timing={snapshot.loopTiming} />
-          <SafetyPanel safety={snapshot.safety} config={safetyConfig} />
-          <CommandTimeline commands={snapshot.commands} />
-          <EventLog events={snapshot.events} />
-        </section>
+        <details className="system-details">
+          <summary><span><strong>System details</strong><small>Command timing, safety thresholds, timeline, and event history</small></span><span className="details-action">Open dashboards</span></summary>
+          <section className="detail-grid">
+            <FeedbackLoop timing={snapshot.loopTiming} />
+            <SafetyPanel safety={snapshot.safety} config={safetyConfig} />
+            <CommandTimeline commands={snapshot.commands} />
+            <EventLog events={snapshot.events} />
+          </section>
+        </details>
 
-        <section className="learn-section">
-          <div className="section-intro"><span><BookOpen /></span><div><span className="eyebrow">MAKE THE CALL</span><h2>Turn the behavior into engineering judgment</h2><p>Short scenarios help you explain why the design works this way.</p></div></div>
-          <LearningLab />
-        </section>
+        <details className="review-details">
+          <summary><span><BookOpen /><strong>Check what you learned</strong></span><span className="details-action">Open review</span></summary>
+          <section className="learn-section">
+            <div className="section-intro"><span><BookOpen /></span><div><span className="eyebrow">MAKE THE CALL</span><h2>Turn the behavior into engineering judgment</h2><p>Short scenarios help you explain why the design works this way.</p></div></div>
+            <LearningLab />
+          </section>
+        </details>
       </main>
 
       <footer><strong>SIGNAL YARD · MODULE 01</strong><p>An educational simulation. It does not represent TerraFirma's private architecture or real construction equipment safety rules.</p></footer>

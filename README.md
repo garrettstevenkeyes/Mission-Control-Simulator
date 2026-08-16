@@ -2,6 +2,8 @@
 
 Signal Yard is an interactive teleoperation network simulator. You control a small excavator, change the network, and watch commands and feedback move through the system.
 
+Seven guided labs lead you from a healthy connection through latency, jitter, loss, stale commands, disconnects, and local control. Each lab tells you what to try, what to watch, why it happened, and what an engineer could do about it.
+
 ## What this project teaches
 
 - Why the full feedback loop matters more than outbound command delay alone
@@ -42,7 +44,7 @@ src/
     components/                simulator UI
     events/                    event history
     hooks/                     React connection to the simulator
-    learning/                  short explanations
+    learning/                  guided labs and short explanations
     machine/                   movement rules
     network/                   packet delay, jitter, and loss
     safety/                    heartbeat and command checks
