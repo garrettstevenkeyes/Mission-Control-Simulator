@@ -45,10 +45,10 @@ function FocusMetrics({ lab, snapshot, safetyConfig }: { lab: GuidedLabDefinitio
   const dropRate = snapshot.stats.sent ? (snapshot.stats.dropped / snapshot.stats.sent) * 100 : 0;
 
   if (lab.id === "baseline") {
-    return <><MetricCard label="Round trip" value={`${snapshot.network.rttMs} ms`} hint="out and back" icon={<Timer />} /><MetricCard label="Observed full loop" value={formatLoopTime(snapshot)} hint="send → see result" icon={<Activity />} /></>;
+    return <><MetricCard label="Configured network RTT" value={`${snapshot.network.rttMs} ms`} hint="network travel only" icon={<Timer />} /><MetricCard label="Measured command-to-view" value={formatLoopTime(snapshot)} hint="complete feedback loop" icon={<Activity />} /></>;
   }
   if (lab.id === "latency") {
-    return <><MetricCard label="Command trip" value={`~${Math.round(snapshot.network.rttMs / 2)} ms`} hint="outbound estimate" icon={<Radio />} /><MetricCard label="Full loop" value={formatLoopTime(snapshot)} hint="what the operator waits for" icon={<Timer />} /><MetricCard label="View age" value={`${telemetryAge.ageMs} ms`} status={telemetryAge.status} hint="operator's last measurement" icon={<Activity />} /></>;
+    return <><MetricCard label="Command trip" value={`~${Math.round(snapshot.network.rttMs / 2)} ms`} hint="outbound estimate" icon={<Radio />} /><MetricCard label="Measured command-to-view" value={formatLoopTime(snapshot)} hint="complete feedback loop" icon={<Timer />} /><MetricCard label="View age" value={`${telemetryAge.ageMs} ms`} status={telemetryAge.status} hint="operator's last measurement" icon={<Activity />} /></>;
   }
   if (lab.id === "jitter") {
     return <><MetricCard label="Jitter setting" value={`${snapshot.network.jitterMs} ms`} hint="delay can vary by this much" icon={<Waves />} /><MetricCard label="Command age range" value={commandAgeRange(snapshot)} hint="compare uneven arrivals" icon={<Clock3 />} /></>;
@@ -62,7 +62,7 @@ function FocusMetrics({ lab, snapshot, safetyConfig }: { lab: GuidedLabDefinitio
   if (lab.id === "disconnect") {
     return <><MetricCard label="Connection" value={snapshot.network.connected ? "Online" : "Offline"} status={{ label: snapshot.network.connected ? "Live" : "Lost", tone: snapshot.network.connected ? "good" : "bad" }} hint="remote link" icon={snapshot.network.connected ? <Wifi /> : <WifiOff />} /><MetricCard label="Heartbeat age" value={`${Math.round(snapshot.safety.heartbeatAgeMs)} ms`} hint={`timeout at ${safetyConfig.heartbeatTimeoutMs} ms`} icon={<HeartPulse />} /><MetricCard label="Machine speed" value={formatReportedSpeed(snapshot.machine.speed)} hint={snapshot.safety.reason} icon={<Gauge />} /></>;
   }
-  return <><MetricCard label="Control mode" value={snapshot.mode === "supervised" ? "Local task" : "Direct"} hint="where small steps happen" icon={<ShieldCheck />} /><MetricCard label="Round trip" value={`${snapshot.network.rttMs} ms`} hint="poor network" icon={<Timer />} /><MetricCard label="Visual updates" value={`${snapshot.feedbackRateFps} fps`} hint="remote feedback only" icon={<Activity />} /></>;
+  return <><MetricCard label="Control mode" value={snapshot.mode === "supervised" ? "Local task" : "Direct"} hint="where small steps happen" icon={<ShieldCheck />} /><MetricCard label="Configured network RTT" value={`${snapshot.network.rttMs} ms`} hint="network travel only" icon={<Timer />} /><MetricCard label="Visual updates" value={`${snapshot.feedbackRateFps} fps`} hint="remote feedback only" icon={<Activity />} /></>;
 }
 
 function FocusControls({

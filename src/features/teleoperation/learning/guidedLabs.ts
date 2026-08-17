@@ -40,11 +40,11 @@ export const guidedLabs: GuidedLabDefinition[] = [
     goal: "Create a baseline so later failures have something clear to compare against.",
     setup: { network: healthyNetwork, mode: "direct", rejectStaleCommands: true },
     steps: ["Load the healthy setup.", "Hold Forward briefly, then release it.", "Notice how closely the machine and faded operator view follow each other."],
-    watch: ["Round trip", "Observed full loop", "Machine vs operator view"],
-    whatHappened: "The command and feedback both crossed the network quickly. The operator saw the result soon enough to make the next decision from a current view.",
+    watch: ["Configured network RTT", "Measured command-to-view", "Machine vs operator view"],
+    whatHappened: "Network RTT measures travel through the network. Command-to-view time also includes machine response, waiting for the next feedback sample, and updating the operator's view. That is why it is higher.",
     engineeringResponse: "Measure this healthy case first. A baseline makes later delay, loss, and safety behavior easier to reason about.",
-    takeaway: "Teleoperation is a loop: command, machine reaction, feedback, then the operator's next command.",
-    deepExplanation: "This is a closed feedback loop. The operator uses returned state to decide the next input, so outbound and return delay both affect control.",
+    takeaway: "Network RTT is only one part of the delay the operator feels. Teleoperation depends on the complete command-to-view loop.",
+    deepExplanation: "This simulator samples visual feedback every 100 ms and processes updates every 50 ms. A command may wait for both, so a 50 ms network RTT can produce about 150 ms from input to visible result. Real systems add camera capture, encoding, decoding, and rendering too.",
   },
   {
     id: "latency",
@@ -55,7 +55,7 @@ export const guidedLabs: GuidedLabDefinition[] = [
     setup: { network: { ...healthyNetwork, rttMs: 400 }, mode: "direct", rejectStaleCommands: true },
     steps: ["Load the high-latency setup.", "Tap Forward or Rotate once.", "Follow the six steps in the command trace."],
     watch: ["Command trip", "Total loop time", "Operator's faded view"],
-    whatHappened: "The machine received the command after the outbound delay. The visual result then needed another network trip before the operator could see it.",
+    whatHappened: "The machine received the command after the outbound delay. Its response then had to be sampled and returned to the operator. Network travel, machine response, feedback sampling, and view updates all contribute to command-to-view time.",
     engineeringResponse: "Reduce unnecessary network trips, show state age, limit speed, and move fast control decisions closer to the machine.",
     takeaway: "A short command trip is not enough. The operator acts on the complete feedback loop.",
     deepExplanation: "Propagation delay is travel time across the network. Queueing delay is time spent waiting behind other traffic. Both can make the returned view older.",
@@ -145,11 +145,11 @@ export function isGuidedLabComplete(id: GuidedLabId, snapshot: SimulationSnapsho
 export function getLiveLabObservation(id: GuidedLabId, snapshot: SimulationSnapshot): string {
   if (id === "baseline") {
     if (!snapshot.commands.length) return "No command yet. Send one to establish the healthy baseline.";
-    return snapshot.loopTiming?.feedbackAt ? `The last full loop took ${Math.round(snapshot.loopTiming.feedbackAt - snapshot.loopTiming.sentAt)} ms.` : "The command is moving through the healthy loop now.";
+    return snapshot.loopTiming?.feedbackAt ? `Configured network RTT: ${snapshot.network.rttMs} ms. Measured command-to-view: ${Math.round(snapshot.loopTiming.feedbackAt - snapshot.loopTiming.sentAt)} ms.` : "The command is moving through the healthy loop now.";
   }
   if (id === "latency") {
     const total = snapshot.loopTiming?.feedbackAt ? Math.round(snapshot.loopTiming.feedbackAt - snapshot.loopTiming.sentAt) : null;
-    return total ? `Outbound estimate: ${Math.round(snapshot.network.rttMs / 2)} ms. Observed full loop: ${total} ms.` : `The outbound trip alone is about ${Math.round(snapshot.network.rttMs / 2)} ms. Send a command to measure the whole loop.`;
+    return total ? `Outbound estimate: ${Math.round(snapshot.network.rttMs / 2)} ms. Measured command-to-view: ${total} ms.` : `The outbound trip alone is about ${Math.round(snapshot.network.rttMs / 2)} ms. Send a command to measure command-to-view time.`;
   }
   if (id === "jitter") {
     const ages = snapshot.commands.flatMap((command) => command.ageMs === undefined ? [] : [command.ageMs]);

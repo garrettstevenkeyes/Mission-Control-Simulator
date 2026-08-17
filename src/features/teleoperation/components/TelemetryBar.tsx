@@ -13,7 +13,7 @@ export function TelemetryBar({ snapshot }: { snapshot: SimulationSnapshot }) {
   const dropRate = snapshot.stats.sent ? (snapshot.stats.dropped / snapshot.stats.sent) * 100 : 0;
   return (
     <section className="telemetry-grid" aria-label="Live telemetry and network metrics">
-      <MetricCard label="Round trip" value={`${snapshot.network.rttMs} ms`} hint="command + return path" icon={<Timer />} />
+      <MetricCard label="Configured network RTT" value={`${snapshot.network.rttMs} ms`} hint="network travel only" icon={<Timer />} />
       <MetricCard label="Command trip" value={`~${Math.round(snapshot.network.rttMs / 2)} ms`} hint="outbound estimate" icon={<Radio />} />
       <MetricCard
         label="Telemetry age"
